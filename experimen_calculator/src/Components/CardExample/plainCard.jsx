@@ -1,5 +1,6 @@
 import React, { Component } from 'react';
-import { Card, Paper, TextField, Typography, withStyles, CardContent, MenuItem, Divider, Button } from '@material-ui/core';
+import { Card, Paper, TextField, Typography, withStyles, CardContent, MenuItem, Divider, Button, List, ListItem, ListItemText, ListSubheader } from '@material-ui/core';
+
 
 const styles = theme => ({
   card: {
@@ -29,8 +30,8 @@ const styles = theme => ({
     marginLeft: theme.spacing.unit,
     marginRight: theme.spacing.unit,
     width: 200,
-    paddingRight: 100,
-    paddingBottom: 20
+    paddingBottom: 20,
+    display: 'inline-block'
   },
   menu: {
     width: 200,
@@ -43,7 +44,6 @@ const styles = theme => ({
   },
   result: { 
       display: 'inline-block',
-      paddingLeft: '50%',
   },
 });
 
@@ -54,7 +54,7 @@ const commodities = [
         label: 'Wine',
     }, 
     { 
-        value: 'Table grape',
+        value: 'tableGrape',
         label: 'Table grape'
     },
     { 
@@ -108,6 +108,8 @@ const products = [
     }
 ];
 
+
+
 const exportDestinations = [
     {
         value: 'France',
@@ -152,7 +154,9 @@ const tableGrapeResi = [ 2,1,0.5,0.3,0.1,0.09,0.08,0.07,0.06,0.05,0.04,0.03,0.02
 
 class PlainCard extends Component {
     state = {
-        suitableProducts: []
+        suitableProducts: [],
+        sprayDate: '2018-07-10',
+        harvestDate: '2018-07-10'
     };
 
     handleChange = name => event => {
@@ -164,6 +168,7 @@ class PlainCard extends Component {
   handleChangeCom = name => event => {
     var suitableProducts = []
     products.map(option => {
+        console.log(event.target.value)
         if (option.appliesTo.includes(event.target.value)){
             suitableProducts.push(option)
         } 
@@ -172,6 +177,7 @@ class PlainCard extends Component {
         [name]: event.target.value,
         suitableProducts: suitableProducts
         });
+        console.log(this.state)
     };
 
     // a and b are javascript Date objects
@@ -202,9 +208,10 @@ class PlainCard extends Component {
                     <CardContent>
                         <Typography variant='title' style={{ textAlign: 'center' }}>
                             Crop Calculator
-                        </Typography>
+                        </Typography> 
                         <Divider/>
-                        <div style={{ paddingTop: 20, align: 'left' }}>
+                        
+                        <div style={{ display: 'inline-block', paddingTop: 20, align: 'left',}}>
                             <TextField
                                 id='commodity'
                                 select
@@ -214,7 +221,7 @@ class PlainCard extends Component {
                                 onChange={this.handleChangeCom('commodity')}
                             >
                             {commodities.map(option => (
-                                <MenuItem key={option.value} value={option.value}>
+                                <MenuItem key={option.value} value={option.label}>
                                     {option.label}
                                 </MenuItem>
                             ))}
@@ -235,29 +242,9 @@ class PlainCard extends Component {
                                 </MenuItem>                    
                             ))}
                             </TextField>
-                            <br/>
-                            <br/>
-                            <TextField
-                                id='destinaton '
-                                select
-                                helperText='Export Destination'
-                                className={classes.TextField}
-                                value={this.state.destination}
-                                onChange={this.handleChange('destination')}
-                            >
-                            {exportDestinations.map(option => ( 
-                                <MenuItem key={option.value} value={option}>
-                                    {option.label}
-                                </MenuItem>
-                            ))}
-                            </TextField>
-                            
-                                <Typography variant='display3' className={classes.result}>
-                                    { this.state.residue ? 'MRL = ' + this.state.residue : 'No' }
-                                </Typography>
                             
                             <br/>
-                            <br/>
+                            <br/> 
                             <TextField
                                 id="sprayDate"
                                 label="Last Application Date"
@@ -270,6 +257,7 @@ class PlainCard extends Component {
                                 shrink: true,
                                 }}
                             />
+                            
                             <br/>
                             <br/>
                             <TextField
@@ -288,6 +276,59 @@ class PlainCard extends Component {
                             <Button variant='outlined' className={classes.button} onClick={() => console.log(this.dateDiffInDays(this.state.sprayDate, this.state.harvestDate))}>
                                 Calculate 
                             </Button>
+                        </div>
+                        
+                        <div className={classes.result}>
+
+                            
+                            
+                                <Typography variant='title' >
+                                    { this.state.residue ? 'Residue level: ' + this.state.residue : '' }
+                                </Typography>
+                            
+                            
+                            <List
+                                component="nav" 
+                                
+                                subheader={<ListSubheader component='div'>You may export to the following countries</ListSubheader>}>
+                                {exportDestinations.map(country => { 
+                                    console.log(country)
+                                    const product = this.state.product;
+                                    const comm = commodities.map(com => {
+                                        if (com.label == this.state.commodity) {
+                                            return com.value
+                                        } else {
+                                            return;
+                                        }
+                                    })
+                                    console.log(product)
+                                    console.log(comm[1])
+                                    console.log(country)
+                                    if (comm[1] && product && this.state.residue) { 
+                                        console.log(country.maxMRL[product])
+                                        console.log(country.maxMRL[product][comm[1]])
+                                        console.log(this.state.residue)
+                                        if ((country.maxMRL[product][comm[1]]) > this.state.residue) {
+                                            
+                                            return (
+                                            <ListItem button>
+                                                <ListItemText primary={country.value + "'s MRL = " + (country.maxMRL[product][comm[1]])} />
+                                            </ListItem>
+                                            ) 
+                                            
+                                            
+                                        } else {
+                                            return (
+                                                <ListItem disabled>
+                                                
+                                                <ListItemText primary={'Residue level too high for ' + country.value } />
+                                                
+                                                </ListItem>
+                                                ) 
+                                        }
+                                    }
+                                })}
+                            </List>
                         </div>
                         
                     </CardContent>
