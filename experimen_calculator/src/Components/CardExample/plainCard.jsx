@@ -119,7 +119,6 @@ const exportDestinations = [
                 wine : 3,
                 tableGrape: 1 
             },
-
         },
     },
     {
@@ -203,15 +202,17 @@ class PlainCard extends Component {
         const { classes } = this.props;
 
         return (
-            <div>
+            <div style={{ width: '50%'}}>
                 <Card className={classes.card}>
                     <CardContent>
                         <Typography variant='title' style={{ textAlign: 'center' }}>
                             Crop Calculator
                         </Typography> 
+                        <br/> 
                         <Divider/>
                         
-                        <div style={{ display: 'inline-block', paddingTop: 20, align: 'left',}}>
+                        
+                        <div style={{ display: 'inline-block', paddingTop: 20, width: '50%'}}>
                             <TextField
                                 id='commodity'
                                 select
@@ -277,8 +278,7 @@ class PlainCard extends Component {
                                 Calculate 
                             </Button>
                         </div>
-                        
-                        <div className={classes.result}>
+                        <div style={{display: 'inline-block', verticalAlign: 'top', paddingTop: '2.5%' }}>
 
                             
                             
@@ -331,7 +331,9 @@ class PlainCard extends Component {
                             </List>
                         </div>
                         
+                        
                     </CardContent>
+                    
                 </Card>
             </div>
         )
